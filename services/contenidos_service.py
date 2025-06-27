@@ -1,5 +1,5 @@
 from database.connection import ConnectionFactory
-from schemas.contenido import ContenidoOut, Contenido, ClsSerieCrear, ClsSerieOut
+from schemas.contenido import ContenidoOut, Contenido, ClsSerieCrear, ClsSerieOut, ClsPeliculaCrear, ClsPeliculaOut
 
 def obtener_contenidos():
     conn = ConnectionFactory.create_connection()
@@ -58,4 +58,35 @@ def service_serie_crear(ObjSerie: ClsSerieCrear) -> ClsSerieOut:
         fecha_lanzamiento=ObjSerie.fecha_lanzamiento,
         tipo_contenido = ObjSerie.tipo_contenido,
         cantidad_temporadas=ObjSerie.cantidad_temporadas        
+    )
+    
+    ## Pelicula
+def service_pelicula_crear(ObjPelicula: ClsPeliculaCrear) -> ClsPeliculaOut:
+    conn = ConnectionFactory.create_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO contenidos (titulo, descripcion, fecha_lanzamiento, tipo_contenido)
+        OUTPUT INSERTED.id 
+        VALUES (?, ?, ?, ?)
+    """, (ObjPelicula.titulo, ObjPelicula.descripcion, ObjPelicula.fecha_lanzamiento, ObjPelicula.tipo_contenido))
+#OUTPUT INSERTED.id  consulta el id generado en la bd
+
+    id_generado = cursor.fetchone()[0]
+    cursor.execute("""
+        INSERT INTO peliculas (contenido_id, duracion_minutos)
+        VALUES (?, ?)
+    """, (id_generado, ObjPelicula.duracion_minutos))
+    conn.commit()
+     
+    cursor.close()
+    conn.close()
+
+    return ClsPeliculaOut(
+        id=id_generado,
+        titulo=ObjPelicula.titulo,
+        descripcion=ObjPelicula.descripcion,
+        fecha_lanzamiento=ObjPelicula.fecha_lanzamiento,
+        tipo_contenido = ObjPelicula.tipo_contenido,
+        duracion_minutos=ObjPelicula.duracion_minutos        
     )

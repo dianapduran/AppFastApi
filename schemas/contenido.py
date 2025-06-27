@@ -29,6 +29,14 @@ class ClsSerieCrear(Contenido):
 class ClsSerieOut(ContenidoOut):
     cantidad_temporadas: int
     
-    
+  # Pelicula   
+ ## para crear contenido pelicula   
+class ClsPeliculaCrear(Contenido):
+    duracion_minutos: int
+
+ ## para consultar contenido serie   
+class ClsPeliculaOut(ContenidoOut):
+    duracion_minutos: int
+       
 
         
